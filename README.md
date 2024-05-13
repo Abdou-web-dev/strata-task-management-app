@@ -1,0 +1,1 @@
+# strata-task-management-app
