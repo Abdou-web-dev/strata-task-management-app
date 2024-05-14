@@ -29,7 +29,8 @@ router.post("/", async (req, res) => {
     await newUser.save();
 
     // Generate token
-    const token = jwt.sign({ _id: newUser._id }, accessTokenSecret, { expiresIn: "1h" });
+    // const token = jwt.sign({ _id: newUser._id }, accessTokenSecret, { expiresIn: "1h" });
+    const token: string = jwt.sign({ _id: newUser._id, timestamp: Date.now() }, accessTokenSecret, { expiresIn: "1h" });
 
     // Return token
     res.json({ token });

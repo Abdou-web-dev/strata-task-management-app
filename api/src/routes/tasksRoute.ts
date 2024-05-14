@@ -1,15 +1,23 @@
 import express, { RequestHandler } from "express";
 import * as taskController from "../controllers/taskController";
-import { authenticateToken } from "../index";
+import authenticateToken from "../middlewares/authenticate";
 
 const router = express.Router();
 
 // this is a method to get all tasks from the database
 // @ts-ignore
-router.get("/", taskController.getAllTasks);
-router.post("/", taskController.createTask);
-router.put("/:id", taskController.updateTask);
-router.delete("/:id", taskController.deleteTask);
+router.get("/", authenticateToken as RequestHandler, taskController.getAllTasks);
+
+// @ts-ignore
+router.get("/:taskId", authenticateToken as RequestHandler, taskController.getTaskById);
+
+// @ts-ignore
+router.post("/", authenticateToken as RequestHandler, taskController.createTask);
+
+// @ts-ignore
+router.put("/:taskId", authenticateToken as RequestHandler, taskController.updateTask);
+// @ts-ignore
+router.delete("/:taskId", authenticateToken as RequestHandler, taskController.deleteTask);
 
 // Read tasks for the authenticated user
 // router.get("/", authenticateToken as RequestHandler, taskController.getAllTasks);

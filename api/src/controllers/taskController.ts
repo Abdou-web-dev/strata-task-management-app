@@ -1,13 +1,10 @@
 import { Request, Response } from "express";
 import { Task } from "../models/Task";
-import { CustomRequest } from "../index";
+import { CustomRequest } from "../middlewares/authenticate";
 
 const getAllTasks = async (req: CustomRequest, res: Response) => {
   try {
     // Fetch tasks from the database
-    // res.send("Welcome to the Task Management App"); // Send a welcome message or render a homepage
-    // const tasks = await Task.find();
-
     const tasks = await Task.find({ userId: req.user._id });
 
     res.json(tasks);
@@ -36,16 +33,16 @@ const getTasksByStatus = async (req: CustomRequest, res: Response) => {
 };
 
 // Controller method for creating a new task
-const createTask = async (req: Request, res: Response) => {
+
+const createTask = async (req: CustomRequest, res: Response) => {
   try {
-    // Extract task data from the request body
     const { title, description, status } = req.body;
 
-    // Create a new task instance
     const newTask = new Task({
       title,
       description,
       status,
+      userId: req.user._id, // Associate task with the authenticated user
     });
 
     // Save the task to the database
@@ -60,54 +57,65 @@ const createTask = async (req: Request, res: Response) => {
 };
 
 // Controller method to update a task
-const updateTask = async (req: Request, res: Response) => {
-  const { taskId } = req.params;
-  const { title, description, status } = req.body;
-
+const updateTask = async (req: CustomRequest, res: Response) => {
   try {
-    // Find the task by ID and update its properties
-    const updatedTask = await Task.findByIdAndUpdate(
-      taskId,
+    const { taskId } = req.params;
+    const { title, description, status } = req.body;
+
+    const updatedTask = await Task.findOneAndUpdate(
+      { _id: taskId, userId: req.user._id },
       { title, description, status },
-      { new: true } // Return the updated task
+      { new: true, runValidators: true }
     );
 
-    // Check if the task exists and is associated with the authenticated user
-    // @ts-ignore
-    if (!updatedTask || updatedTask.userId.toString() !== req.user._id) {
-      return res.status(404).json({ message: "Task not found" });
+    if (!updatedTask) {
+      return res.status(404).json({ error: "Task not found" });
     }
 
-    // Respond with the updated task
     res.json(updatedTask);
   } catch (error) {
-    // Handle errors
     console.error("Error updating task:", error);
-    res.status(500).json({ message: "Failed to update task" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
 // Controller method to delete a task
-const deleteTask = async (req: Request, res: Response) => {
-  const { taskId } = req.params;
-
+const deleteTask = async (req: CustomRequest, res: Response) => {
   try {
-    // Find the task by ID and delete it
-    const deletedTask = await Task.findByIdAndDelete(taskId);
+    const { taskId } = req.params;
 
-    // @ts-ignore
-    // Check if the task exists and is associated with the authenticated user
-    if (!deletedTask || deletedTask.userId.toString() !== req.user._id) {
-      return res.status(404).json({ message: "Task not found" });
+    const deletedTask = await Task.findOneAndDelete({
+      _id: taskId,
+      userId: req.user._id,
+    });
+
+    if (!deletedTask) {
+      return res.status(404).json({ error: "Task not found" });
     }
 
-    // Respond with a success message
     res.json({ message: "Task deleted successfully" });
   } catch (error) {
-    // Handle errors
     console.error("Error deleting task:", error);
-    res.status(500).json({ message: "Failed to delete task" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export { createTask, getAllTasks, deleteTask, updateTask };
+const getTaskById = async (req: CustomRequest, res: Response) => {
+  try {
+    const { taskId } = req.params;
+
+    // Find the task by ID and ensure it belongs to the authenticated user
+    const task = await Task.findOne({ _id: taskId, userId: req.user._id });
+
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.json(task);
+  } catch (error) {
+    console.error("Error fetching task:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export { createTask, getAllTasks, deleteTask, updateTask, getTaskById };

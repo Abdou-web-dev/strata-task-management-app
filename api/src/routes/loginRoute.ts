@@ -1,13 +1,12 @@
 import express from "express";
-import jwt from "jsonwebtoken";
 import { User } from "../models/User"; // Adjust the path to your User model
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-// login route handler
 router.post("/", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body; // allows for both username and email to be received from the client.
 
   // Ensure ACCESS_TOKEN_SECRET is defined
   const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
@@ -16,17 +15,21 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ username });
+    // Find user by username or email
+    const user = await User.findOne({ $or: [{ username }, { email }] });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Check if password matches
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ _id: user._id }, accessTokenSecret, { expiresIn: "1h" });
+    // Generate token
+    const token = jwt.sign({ _id: user._id, timestamp: Date.now() }, accessTokenSecret, { expiresIn: "1h" });
+
     res.json({ token });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
