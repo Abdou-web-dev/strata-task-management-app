@@ -2,27 +2,29 @@ import express, { NextFunction, RequestHandler } from "express";
 import cors from "cors";
 import mongoose, { ConnectOptions } from "mongoose";
 import jwt from "jsonwebtoken";
-// import { Task } from "./models/Task";
 import { User } from "./types/types";
+import dotenv from "dotenv";
 import loginRoute from "./routes/loginRoute";
 import signupRoute from "./routes/signupRoute";
-import tasksRoutes from "./routes/tasksRoutes";
-// const morgan = require("morgan");
+import tasksRoute from "./routes/tasksRoute";
 import morgan from "morgan";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+dotenv.config();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
 app.use(morgan("dev")); // Log requests in 'dev' format
 
-interface CustomRequest extends Request {
+export interface CustomRequest extends Request {
   user: User;
 }
 
-mongoose.connect("mongodb://127.0.0.1:27017/task_manager", {
+const MONGODB_URI: string = process.env.MONGODB_URI as string;
+
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 } as Parameters<typeof mongoose.connect>[1]);
@@ -55,7 +57,7 @@ const authenticateToken: RequestHandler = (req: CustomRequest, res: Response, ne
 // Routes
 app.use("/api/login", loginRoute);
 app.use("/api/signup", signupRoute);
-app.use("/api/tasks", tasksRoutes);
+app.use("/api/tasks", tasksRoute);
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

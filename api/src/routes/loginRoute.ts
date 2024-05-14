@@ -1,24 +1,36 @@
 import express from "express";
-const router = express.Router();
 import jwt from "jsonwebtoken";
-import { User } from "../models/User";
+import { User } from "../models/User"; // Adjust the path to your User model
+import bcrypt from "bcrypt";
 
+const router = express.Router();
+
+// login route handler
 router.post("/", async (req, res) => {
   const { username, password } = req.body;
 
-  try {
-    const user = await User.findOne({ username, password });
+  // Ensure ACCESS_TOKEN_SECRET is defined
+  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+  if (!accessTokenSecret) {
+    return res.status(500).json({ message: "Token secret not defined" });
+  }
 
+  try {
+    const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET!);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
-    res.json({ accessToken });
+    const token = jwt.sign({ _id: user._id }, accessTokenSecret, { expiresIn: "1h" });
+    res.json({ token });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 export default router;
