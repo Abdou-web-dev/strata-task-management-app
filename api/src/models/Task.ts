@@ -4,7 +4,7 @@ export interface TaskDocument extends Document {
   title: string;
   description: string;
   status: "pending" | "completed";
-  userId: string; // userId is used to associate tasks with users
+  userId: mongoose.Types.ObjectId; // Reference to the User model
 }
 
 // schema for the task model

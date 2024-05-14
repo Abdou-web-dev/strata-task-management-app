@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, RequestHandler } from "express";
 import cors from "cors";
 import mongoose, { ConnectOptions } from "mongoose";
 import jwt from "jsonwebtoken";
@@ -7,6 +7,8 @@ import { User } from "./types/types";
 import loginRoute from "./routes/loginRoute";
 import signupRoute from "./routes/signupRoute";
 import tasksRoutes from "./routes/tasksRoutes";
+// const morgan = require("morgan");
+import morgan from "morgan";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,45 +16,48 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(morgan("dev")); // Log requests in 'dev' format
 
 interface CustomRequest extends Request {
   user: User;
 }
 
-// Connection to MongoDB
-const mongooseOptions: ConnectOptions = {
-  // @ts-ignore
+mongoose.connect("mongodb://127.0.0.1:27017/task_manager", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-};
+} as Parameters<typeof mongoose.connect>[1]);
 
-mongoose
-  .connect("mongodb://localhost:27017/task_manager", mongooseOptions)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error(err));
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+db.once("open", () => {
+  console.log("Connected to MongoDB");
+});
 
 // Authentication middleware
-function authenticateToken(req: CustomRequest, res: express.Response, next: express.NextFunction) {
-  const authHeader = req.headers["authorization"];
+// @ts-ignore
+const authenticateToken: RequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => {
+  // @ts-ignore
+  const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
+
+  // @ts-ignore
   if (!token) return res.sendStatus(401);
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, user) => {
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err: jwt.VerifyErrors | null, user: any) => {
+    // @ts-ignore
     if (err) return res.sendStatus(403);
+
     req.user = user;
     next();
   });
-}
+};
 
 // Routes
 app.use("/api/login", loginRoute);
 app.use("/api/signup", signupRoute);
 app.use("/api/tasks", tasksRoutes);
 
-// @ts-ignore
-// app.get("/tasks", authenticateToken, async (req: CustomRequest, res) => {
-//   const tasks = await Task.find({ userId: req.user.username });
-//   res.json(tasks);
-// });
-
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+export { authenticateToken };
