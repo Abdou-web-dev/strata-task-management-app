@@ -1,34 +1,26 @@
 import express, { RequestHandler } from "express";
 import * as taskController from "../controllers/taskController";
-import authenticateToken from "../middlewares/authenticate";
+import checkAuthToken from "../middlewares/authenticate";
 
 const router = express.Router();
 
+// The checkAuthToken function is a middleware function that handles the authentication of incoming requests using JWT (JSON Web Token).
+// @ts-ignore
 // this is a method to get all tasks from the database
-// @ts-ignore
-router.get("/", authenticateToken as RequestHandler, taskController.getAllTasks);
+router.get("/", checkAuthToken as RequestHandler, taskController.getAllTasks);
 
 // @ts-ignore
-router.get("/:taskId", authenticateToken as RequestHandler, taskController.getTaskById);
+router.get("/:taskId", checkAuthToken as RequestHandler, taskController.getTaskById);
 
 // @ts-ignore
-router.post("/", authenticateToken as RequestHandler, taskController.createTask);
+router.post("/", checkAuthToken as RequestHandler, taskController.createTask);
 
 // @ts-ignore
-router.put("/:taskId", authenticateToken as RequestHandler, taskController.updateTask);
+router.put("/:taskId", checkAuthToken as RequestHandler, taskController.updateTask);
 // @ts-ignore
-router.delete("/:taskId", authenticateToken as RequestHandler, taskController.deleteTask);
-
-// Read tasks for the authenticated user
-// router.get("/", authenticateToken as RequestHandler, taskController.getAllTasks);
+router.delete("/:taskId", checkAuthToken as RequestHandler, taskController.deleteTask);
 
 // // Read tasks filtered by status for the authenticated user
-// router.get("/status/:status", authenticateToken as RequestHandler, taskController.getTasksByStatus);
-
-// // Update a task
-// router.put("/:taskId", authenticateToken as RequestHandler, taskController.updateTask);
-
-// // Delete a task
-// router.delete("/:taskId", authenticateToken as RequestHandler, taskController.deleteTask);
+// router.get("/status/:status", checkAuthToken as RequestHandler, taskController.getTasksByStatus);
 
 export default router;

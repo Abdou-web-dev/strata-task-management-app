@@ -1,7 +1,7 @@
 import express from "express";
 import { User } from "../models/User"; // Adjust the path to your User model
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { Secret, SignOptions } from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -27,8 +27,14 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    const payload = { _id: user._id, timestamp: Date.now() };
+    const options = { expiresIn: "1h" };
+    const secretOrPrivateKey = process.env.ACCESS_TOKEN_SECRET!;
+    // the "!" is to assure TypeScript compiler that process.env.ACCESS_TOKEN_SECRET will definitely have a value when the code runs.
+
     // Generate token
-    const token = jwt.sign({ _id: user._id, timestamp: Date.now() }, accessTokenSecret, { expiresIn: "1h" });
+    const token = jwt.sign(payload, secretOrPrivateKey, options);
+    // const token = jwt.sign({ _id: user._id, timestamp: Date.now() }, accessTokenSecret, { expiresIn: "1h" });
 
     res.json({ token });
   } catch (error) {

@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
-import mongoose, { ConnectOptions } from "mongoose";
-import { User } from "./types/types";
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 import loginRoute from "./routes/loginRoute";
 import signupRoute from "./routes/signupRoute";

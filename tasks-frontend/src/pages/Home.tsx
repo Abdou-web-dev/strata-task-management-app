@@ -39,10 +39,16 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Tasks : </h2>
-      <TaskForm onSubmit={handleAddTask} />
-      <TaskList tasks={tasks} />
+    <div className="home-container p-4 md:p-8 lg:p-12">
+      <h2 className="text-2xl font-bold mb-6 ">Tasks:</h2>
+      <div className="mb-8 flex justify-center">
+        <div className="w-full max-w-md p-4 bg-white rounded-lg shadow-md">
+          <TaskForm onSubmit={handleAddTask} />
+        </div>
+      </div>
+      <div className="tasks-list">
+        <TaskList tasks={tasks} />
+      </div>
     </div>
   );
 };
