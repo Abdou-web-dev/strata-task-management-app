@@ -3,6 +3,7 @@ import { loginUser } from "../api/auth";
 import AuthForm from "../components/AuthForm";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
+import "../globalStyles/globalStyles.css";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -23,14 +24,16 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <AuthForm onSubmit={handleLogin} />
-
-      <div>
-        <p>Don't have an account ? Make a new one.</p>
+    <div className="flex justify-center items-center flex-col my-24">
+      {/* <h2>Login</h2> */}
+      <div className="w-full sm:w-1/2 lg:w-[35%]">
+        {/* Responsive width */}
+        <AuthForm onSubmit={handleLogin} />
+      </div>
+      <div className="mt-4 text-center">
+        <p className="my-4 sedan-regular">Don't have an account ? Make a new one.</p>
         <button
-          className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+          className="bg-slate-500  hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
           onClick={() => navigate("/signup")}
         >
           Sign up

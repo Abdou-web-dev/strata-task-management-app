@@ -25,11 +25,14 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Sign Up</h2>
-      <AuthForm onSubmit={handleSignup} />
-      <div>
-        <p>Already have an account ?</p>
+    <div className="flex justify-center items-center flex-col my-24">
+      <div className="w-full sm:w-1/2 lg:w-[35%]">
+        <AuthForm onSubmit={handleSignup} />
+      </div>
+
+      <div className="mt-4 text-center">
+        <p className="my-4 sedan-regular">Already have an account ?</p>
+
         <button
           className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
           onClick={() => navigate("/login")}

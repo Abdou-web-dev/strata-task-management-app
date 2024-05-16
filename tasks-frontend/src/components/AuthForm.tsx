@@ -20,65 +20,73 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit }) => {
     onSubmit(username, email, password);
   };
 
+  const inputWrapperClassName = `mb-8 xl:flex xl:flex-row xl:justify-between xl:gap-8 xl:items-center
+  sm:flex sm:flex-col sm:justify-between sm:gap-1 sm:items-center`;
+
+  const inputClassName = `form-input pl-2 mt-1 block w-full sm:w-3/4 md:w-2/3 lg:w-2/3 h-10 border border-gray-300 rounded-md focus:outline-none focus:shadow-lg focus:shadow-indigo-100 hover:shadow-md hover:shadow-gray-300 transition-shadow duration-200`;
+
   return (
     <form
-      className="auth-form-component bg-gray-100 p-6 rounded-md shadow-md"
+      className="auth-form-component  bg-gray-100 p-4 xl:p-8 rounded-md shadow-md"
       onSubmit={handleSubmit}
     >
-      <div className="mb-4">
+      <div className={`${inputWrapperClassName} `}>
+        {/* <div className="mb-8 flex flex-row justify-between gap-8 items-center "> */}
         <label
-          className="block text-gray-700"
+          className="block text-gray-700 roboto-regular"
           htmlFor="username"
         >
-          Username:
+          Username :
         </label>
         <input
           id="username"
-          className="form-input mt-1 block w-full border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+          className={`${inputClassName}`}
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
       </div>
-      <div className="mb-4">
+      <div className={`${inputWrapperClassName}`}>
         <label
-          className="block text-gray-700"
+          className="block text-gray-700 roboto-regular"
           htmlFor="email"
         >
-          Email:
+          Email :
         </label>
         <input
           id="email"
-          className="form-input mt-1 block w-full border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+          className={`${inputClassName}`}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
       </div>
-      <div className="mb-6">
+      <div className={`${inputWrapperClassName}`}>
         <label
-          className="block text-gray-700"
+          className="block text-gray-700 roboto-regular"
           htmlFor="password"
         >
-          Password:
+          Password :
         </label>
         <input
           id="password"
-          className="form-input mt-1 block w-full border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+          className={`${inputClassName}`}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
       </div>
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        type="submit"
-      >
-        {pathname === "/signup" ? "Sign Up" : pathname === "/login" ? "Login" : ""}
-      </button>
+      <div className="flex items-center flex-col justify-center">
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          type="button"
+        >
+          {pathname === "/signup" ? "Sign Up" : pathname === "/login" ? "Login" : ""}
+        </button>
+      </div>
     </form>
   );
 };

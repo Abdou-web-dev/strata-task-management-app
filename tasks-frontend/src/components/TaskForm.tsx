@@ -9,16 +9,14 @@ interface TaskFormProps {
 const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
   const formikAddTask = useFormik({
     initialValues: {
-      status: "pending",
+      status: "",
       description: "",
       title: "",
     },
     validationSchema: taskValidationSchema,
-    onSubmit: (values) => {
-      addTask(formikAddTask.values.title, formikAddTask.values.description, formikAddTask.values.status);
-      // e.preventDefault();
-      formikAddTask.resetForm();
-      // navigate("/"); // Redirect to the tasks page
+    onSubmit: (values, { resetForm }) => {
+      addTask(values.title, values.description, values.status);
+      resetForm();
     },
     validate: () => {},
   });
@@ -41,11 +39,11 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
           name="title" //The name attribute should match the field name in formik initialValues.
           value={formikAddTask.values.title}
           onChange={formikAddTask.handleChange}
-          onBlur={formikAddTask.handleBlur}
+          onBlur={formikAddTask.handleBlur} //Errors are shown as soon as the user interacts with a field.
           required
           className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
         />
-        {formikAddTask.errors.title ? (
+        {formikAddTask.touched.title && formikAddTask.errors.title ? (
           <div className="text-red-500 text-xs mt-1 mb-6">{formikAddTask.errors.title}</div>
         ) : null}
       </div>
@@ -66,7 +64,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
           required
           className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
         ></textarea>
-        {formikAddTask.errors.description ? (
+        {formikAddTask.touched.description && formikAddTask.errors.description ? (
           <div className="text-red-500 text-xs mt-1 mb-6">{formikAddTask.errors.description}</div>
         ) : null}
       </div>
@@ -85,15 +83,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
           onBlur={formikAddTask.handleBlur}
           className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
         >
+          <option value="">Select Status</option>
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
         </select>
-        {formikAddTask.errors.status ? (
+        {formikAddTask.touched.status && formikAddTask.errors.status ? (
           <div className="text-red-500 text-xs mt-1 mb-6">{formikAddTask.errors.status}</div>
         ) : null}
       </div>
       <button
         type="submit"
+        onClick={() => console.log("submit btn clicked")}
         className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
       >
         Add Task
