@@ -8,16 +8,13 @@ const Signup: React.FC = () => {
   const { setIsLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleSignup = async (username: string, email: string, password: string) => {
+  const handleSignup = async (username: string | undefined, email: string, password: string) => {
     try {
       const { token } = await registerUser(username, email, password);
       setIsLoggedIn(true);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("token", token);
       console.log(token, "token");
-      // console.log("Signup successful, token generated upon Signup is:", token);
-
-      // Redirect to the tasks page or another appropriate page
       navigate("/");
     } catch (error) {
       console.error("Signup failed:", error);
@@ -27,7 +24,10 @@ const Signup: React.FC = () => {
   return (
     <div className="flex justify-center items-center flex-col my-24">
       <div className="w-full sm:w-1/2 lg:w-[35%]">
-        <AuthForm onSubmit={handleSignup} />
+        <AuthForm
+          onSubmit={handleSignup}
+          isSignUp={true}
+        />
       </div>
 
       <div className="mt-4 text-center">

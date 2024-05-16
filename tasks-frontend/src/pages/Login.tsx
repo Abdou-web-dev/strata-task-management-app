@@ -9,9 +9,9 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { setIsLoggedIn } = useContext(AuthContext);
 
-  const handleLogin = async (username: string, email: string, password: string) => {
+  const handleLogin = async (username: string | undefined, email: string, password: string) => {
     try {
-      const data = await loginUser(username, password, email);
+      const data = await loginUser(password, email);
       localStorage.setItem("token", data.token);
       setIsLoggedIn(true);
       localStorage.setItem("isLoggedIn", "true");
@@ -26,9 +26,12 @@ const Login: React.FC = () => {
   return (
     <div className="flex justify-center items-center flex-col my-24">
       {/* <h2>Login</h2> */}
+      {/* Responsive width */}
       <div className="w-full sm:w-1/2 lg:w-[35%]">
-        {/* Responsive width */}
-        <AuthForm onSubmit={handleLogin} />
+        <AuthForm
+          onSubmit={handleLogin}
+          isSignUp={false}
+        />
       </div>
       <div className="mt-4 text-center">
         <p className="my-4 sedan-regular">Don't have an account ? Make a new one.</p>

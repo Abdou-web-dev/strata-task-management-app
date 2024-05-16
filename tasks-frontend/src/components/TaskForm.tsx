@@ -18,7 +18,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
       addTask(values.title, values.description, values.status);
       resetForm();
     },
-    validate: () => {},
+    // validate: () => {},
   });
 
   return (

@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api";
 
-export const registerUser = async (username: string, email: string, password: string) => {
+export const registerUser = async (username: string | undefined, email: string, password: string) => {
   try {
     const response = await axios.post(`${API_URL}/signup`, { username, email, password });
     console.log(response, "response from auth.ts upon registering a new user from client");
@@ -13,9 +13,9 @@ export const registerUser = async (username: string, email: string, password: st
   }
 };
 
-export const loginUser = async (username: string, password: string, email: string) => {
+export const loginUser = async (password: string, email: string) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { username, password, email });
+    const response = await axios.post(`${API_URL}/login`, { password, email });
     return response.data;
   } catch (error) {
     console.error("Error signing up", error);
