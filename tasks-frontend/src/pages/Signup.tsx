@@ -1,16 +1,24 @@
-import React from "react";
+import React, { useContext } from "react";
 import { registerUser } from "../api/auth";
 import AuthForm from "../components/AuthForm";
+import { AuthContext } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const Signup: React.FC = () => {
+  const { setIsLoggedIn } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const handleSignup = async (username: string, email: string, password: string) => {
     try {
       const { token } = await registerUser(username, email, password);
-      console.log(token, "token");
+      setIsLoggedIn(true);
+      localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("token", token);
-      console.log("Signup successful, token generated upon Signup is:", token);
+      console.log(token, "token");
+      // console.log("Signup successful, token generated upon Signup is:", token);
 
       // Redirect to the tasks page or another appropriate page
+      navigate("/");
     } catch (error) {
       console.error("Signup failed:", error);
     }
@@ -19,10 +27,16 @@ const Signup: React.FC = () => {
   return (
     <div>
       <h2>Sign Up</h2>
-      <AuthForm
-        onSubmit={handleSignup}
-        isSignup
-      />
+      <AuthForm onSubmit={handleSignup} />
+      <div>
+        <p>Already have an account ?</p>
+        <button
+          className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded"
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </button>
+      </div>
     </div>
   );
 };

@@ -15,14 +15,12 @@ export const getTasks = async (token: string) => {
 };
 
 export const createTask = async (title: string, description: string, status: string, token: string) => {
-  const response = await axios.post(
-    `${API_URL}/tasks`,
-    { title, description, status },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const EndpointURL = `${API_URL}/tasks`;
+  const ReqBody = { title, description, status };
+  const response = await axios.post(EndpointURL, ReqBody, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
