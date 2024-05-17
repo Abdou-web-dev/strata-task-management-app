@@ -36,3 +36,23 @@ export const deleteTask = async (taskId: string, token: string) => {
     console.error(error);
   }
 };
+
+export const updateTask = async (
+  taskId: string,
+  token: string,
+  newTitle: string,
+  newDesc: string,
+  newStatus: "completed" | "pending"
+) => {
+  try {
+    const updateReqBody = { newTitle, newDesc, newStatus };
+
+    await axios.put(`${API_URL}/tasks/${taskId}`, updateReqBody, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};

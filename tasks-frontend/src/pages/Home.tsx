@@ -1,19 +1,18 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getTasks, createTask } from "../api/tasks";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 import { AuthContext } from "../context/authContext";
 import { TasksContext } from "../context/tasksContext";
+import Modal from "react-modal";
 
 const Home: React.FC = () => {
   const { setIsLoggedIn } = useContext(AuthContext);
   const { tasks, setTasks } = useContext(TasksContext);
+  const [logOutModalOpen, setlogOutModalOpen] = useState(false);
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    // Remove token from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("isLoggedIn");
+    setlogOutModalOpen(true);
   };
 
   // fetch tasks from the db on first render
@@ -76,6 +75,44 @@ const Home: React.FC = () => {
       <div className="tasks-list">
         <TaskList tasks={tasks} />
       </div>
+
+      {/* Modal with delete functionality */}
+      <Modal
+        isOpen={logOutModalOpen}
+        onRequestClose={() => setlogOutModalOpen(false)}
+        contentLabel="Delete Prompt Modal"
+        style={{
+          content: {
+            width: "30%",
+            height: "30%",
+            margin: "0 auto",
+          },
+        }}
+        className={"tasks-modal logout-modal"}
+      >
+        <h3>Are you sure you want to logout ?</h3>
+        <div className="modal-btns">
+          <button
+            className={`modal-btn-yes`}
+            onClick={() => {
+              setIsLoggedIn(false);
+              // Remove token from localStorage
+              localStorage.removeItem("token");
+              localStorage.removeItem("isLoggedIn");
+            }}
+          >
+            <span>YES</span>
+          </button>
+          <button
+            className={`modal-btn-no`}
+            onClick={() => {
+              setlogOutModalOpen(false);
+            }}
+          >
+            <span>NO</span>
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

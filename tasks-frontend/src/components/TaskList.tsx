@@ -4,6 +4,9 @@ import { Task } from "../types/taskTypes";
 import Modal from "react-modal";
 import { TasksContext } from "../context/tasksContext";
 import { deleteTask } from "../api/tasks";
+import "../globalStyles/styles.scss";
+import { useMediaQuery } from "../hooks/UseMediaQuery";
+import EditModal from "./modals/EditModal";
 
 interface TaskListProps {
   tasks: Task[];
@@ -12,6 +15,7 @@ interface TaskListProps {
 const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
   const { isTaskModalOpen, setIsTaskModalOpen, setTasks } = useContext(TasksContext);
   const [taskToDeleteId, setTaskToDeleteId] = useState("");
+  const isSmallScreen = useMediaQuery("(max-width: 1400px)"); // meaning < 1400px
 
   const deleteOneTask = async (taskId: string) => {
     try {
@@ -40,7 +44,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
       <>
         {tasks?.map((task) => (
           <TaskCard
-            {...{ task, setTaskToDeleteId }}
+            {...{ task, setTaskToDeleteId, deleteOneTask }}
             key={task._id}
           ></TaskCard>
         ))}
@@ -57,14 +61,17 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
             margin: "0 auto",
           },
         }}
+        className={"tasks-modal"}
       >
         <h3>Are you sure you want to delete this task ?</h3>
         <div className="modal-btns">
           <button
             className={`modal-btn-yes`}
             onClick={() => {
-              deleteOneTask(taskToDeleteId);
-              setIsTaskModalOpen(false);
+              if (!isSmallScreen) {
+                deleteOneTask(taskToDeleteId);
+                setIsTaskModalOpen(false);
+              }
             }}
           >
             <span>YES</span>
@@ -72,13 +79,17 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
           <button
             className={`modal-btn-no`}
             onClick={() => {
-              setIsTaskModalOpen(false);
+              if (!isSmallScreen) {
+                setIsTaskModalOpen(false);
+              }
             }}
           >
             <span>NO</span>
           </button>
         </div>
       </Modal>
+
+      <EditModal {...{}} />
     </div>
   );
 };
