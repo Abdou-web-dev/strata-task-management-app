@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { taskValidationSchema } from "../validation/taskValidationSchema";
 import { useFormik } from "formik";
+import { TasksContext } from "../context/tasksContext";
 
 interface TaskFormProps {
   onSubmit: (title: string, description: string, status: string) => void;
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
+  const { setFilterStatus } = useContext(TasksContext);
+
   const formikAddTask = useFormik({
     initialValues: {
       status: "",
@@ -17,8 +20,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
     onSubmit: (values, { resetForm }) => {
       addTask(values.title, values.description, values.status);
       resetForm();
+      setFilterStatus("all");
     },
-    // validate: () => {},
   });
 
   return (
@@ -60,9 +63,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit: addTask }) => {
           name="description"
           onChange={formikAddTask.handleChange}
           onBlur={formikAddTask.handleBlur}
-          // onChange={(e) => setDescription(e.target.value)}
           required
-          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          className="task-resize-textarea w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
         ></textarea>
         {formikAddTask.touched.description && formikAddTask.errors.description ? (
           <div className="text-red-500 text-xs mt-1 mb-6">{formikAddTask.errors.description}</div>

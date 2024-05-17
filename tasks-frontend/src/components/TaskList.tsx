@@ -3,19 +3,39 @@ import TaskCard from "./TaskCard";
 import { Task } from "../types/taskTypes";
 import Modal from "react-modal";
 import { TasksContext } from "../context/tasksContext";
-import { deleteTask } from "../api/tasks";
+import { deleteTask, updateTask } from "../api/tasks";
 import "../globalStyles/styles.scss";
 import { useMediaQuery } from "../hooks/UseMediaQuery";
 import EditModal from "./modals/EditModal";
 
 interface TaskListProps {
   tasks: Task[];
+  filteredTasks: Task[];
 }
 
-const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
+const TaskList: React.FC<TaskListProps> = ({ tasks, filteredTasks }) => {
   const { isTaskModalOpen, setIsTaskModalOpen, setTasks } = useContext(TasksContext);
   const [taskToDeleteId, setTaskToDeleteId] = useState("");
   const isSmallScreen = useMediaQuery("(max-width: 1400px)"); // meaning < 1400px
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
+  const handleEditTask = async (
+    taskId: string,
+    newTitle?: string,
+    newDesc?: string,
+    newStatus?: "completed" | "pending"
+  ) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const updatedTask = await updateTask(taskId, token, newTitle, newDesc, newStatus);
+        // Update the tasks state with the updated task
+        setTasks((prevTasks) => prevTasks?.map((task) => (task._id === updatedTask._id ? updatedTask : task)));
+      }
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
+  };
 
   const deleteOneTask = async (taskId: string) => {
     try {
@@ -41,11 +61,19 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
 
   return (
     <div className="tasks-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-      <>
+      {/* <>
         {tasks?.map((task) => (
           <TaskCard
-            {...{ task, setTaskToDeleteId, deleteOneTask }}
+            {...{ setTaskToEdit, task, setTaskToDeleteId, deleteOneTask }}
             key={task._id}
+          ></TaskCard>
+        ))}
+      </> */}
+      <>
+        {filteredTasks?.map((filteredTask) => (
+          <TaskCard
+            {...{ setTaskToEdit, task: filteredTask, setTaskToDeleteId, deleteOneTask }}
+            key={filteredTask._id}
           ></TaskCard>
         ))}
       </>
@@ -88,8 +116,14 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
           </button>
         </div>
       </Modal>
-
-      <EditModal {...{}} />
+      {taskToEdit && (
+        <EditModal
+          // isOpen={Boolean(taskToEdit)}
+          onRequestClose={() => setTaskToEdit(null)}
+          taskToEdit={taskToEdit}
+          onSave={handleEditTask}
+        />
+      )}
     </div>
   );
 };

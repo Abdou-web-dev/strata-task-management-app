@@ -22,6 +22,7 @@ const App: React.FC = () => {
       <Routes>
         <Route
           path="/"
+          // Home contains tasks list and tasks form
           element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
         />
         <Route

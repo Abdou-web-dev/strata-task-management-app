@@ -1,30 +1,32 @@
-import { FunctionComponent, useContext, useState } from "react";
+import { FunctionComponent, useContext, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import closeIcon from "../../../assets/img/close.svg";
 import { useFormik } from "formik";
 import { TasksContext } from "../../context/tasksContext";
-import { taskValidationSchema } from "../../validation/taskValidationSchema";
+import { Task } from "../../types/taskTypes";
+import { updateFormValidationSchema } from "../../validation/taskValidationSchema";
 
-interface EditModalProps {}
+interface EditModalProps {
+  onRequestClose: () => void;
+  taskToEdit: Task;
+  onSave: (taskId: string, newTitle?: string, newDesc?: string, newStatus?: "completed" | "pending") => Promise<void>;
+}
 
-const EditModal: FunctionComponent<EditModalProps> = () => {
+const EditModal: FunctionComponent<EditModalProps> = ({ onRequestClose, taskToEdit, onSave }) => {
   const { editModalOpen, setEditModalOpen } = useContext(TasksContext);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const formikUpdateTaskForm = useFormik({
     initialValues: {
-      newName: "",
-      newDescription: "",
-      newStatus: "",
+      newName: taskToEdit?.title,
+      newDescription: taskToEdit?.description,
+      newStatus: taskToEdit?.status,
     },
-    validationSchema: taskValidationSchema,
-    onSubmit: (values, { resetForm }) => {
-      onSubmit(values.newDescription, values.newName);
-
-      //   if (error.length > 0) {
-      //     return; // leave the onSubmit function early if there is a server error
-      //   } else {
-      //     resetForm; // if there is no backend error , then clear the form fields
-      //   }
+    validationSchema: updateFormValidationSchema,
+    onSubmit: async (values, { resetForm }) => {
+      await onSave(taskToEdit._id, values.newName, values.newDescription, values.newStatus);
+      resetForm();
+      onRequestClose();
     },
   });
 
@@ -32,13 +34,14 @@ const EditModal: FunctionComponent<EditModalProps> = () => {
     <Modal
       isOpen={editModalOpen}
       onRequestClose={() => {
+        onRequestClose();
         setEditModalOpen(false);
       }}
       contentLabel="Edit Task Modal"
       style={{
         content: {
           width: "40%",
-          height: "50%",
+          height: "70%",
           margin: "0 auto",
           position: "relative",
           top: "5rem",
@@ -49,6 +52,8 @@ const EditModal: FunctionComponent<EditModalProps> = () => {
     >
       <button
         onClick={() => {
+          onRequestClose();
+
           setEditModalOpen(false);
         }}
         className="top-2 right-2 absolute"
@@ -59,14 +64,14 @@ const EditModal: FunctionComponent<EditModalProps> = () => {
           alt=""
         />
       </button>
-      <h3 className="italic text-2xl font-semibold mb-4">Edit Category : </h3>
+      <h3 className="italic text-2xl font-semibold mb-4">Update this task : </h3>
       <form onSubmit={formikUpdateTaskForm.handleSubmit}>
         <div className="mb-4 modal-content">
           <label
             htmlFor="editLabel"
             className="block text-sm font-medium text-gray-700"
           >
-            Label :
+            New name :
           </label>
           <input
             type="text"
@@ -78,36 +83,50 @@ const EditModal: FunctionComponent<EditModalProps> = () => {
             onChange={formikUpdateTaskForm.handleChange}
             onBlur={formikUpdateTaskForm.handleBlur}
           />
+          {formikUpdateTaskForm.touched.newName && formikUpdateTaskForm.errors.newName ? (
+            <div className="text-red-500 text-xs mt-1 mb-6">{formikUpdateTaskForm.errors.newName}</div>
+          ) : null}
         </div>
-        <div className="mb-4">
+        <div className="mb-4 textarea-container">
           <label
-            htmlFor="editPosition"
+            htmlFor=""
             className="block text-sm font-medium text-gray-700"
           >
-            Position :
+            New Description :
           </label>
-          <input
-            type="text"
+          <textarea
             id="newDescription"
-            className="mt-1 p-2 border rounded-md w-full hover:shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
             placeholder="Enter a new description"
             name="newDescription"
             value={formikUpdateTaskForm.values.newDescription}
             onChange={formikUpdateTaskForm.handleChange}
             onBlur={formikUpdateTaskForm.handleBlur}
+            required
+            ref={textareaRef}
+            onResize={() => {
+              console.log("resized");
+            }}
+            style={{
+              maxWidth: `${500}px`,
+              maxHeight: `${400}px`,
+            }}
+            className="edit-resize-textarea w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
           />
+          {formikUpdateTaskForm.touched.newDescription && formikUpdateTaskForm.errors.newDescription ? (
+            <div className="text-red-500 text-xs mt-1 mb-6">{formikUpdateTaskForm.errors.newDescription}</div>
+          ) : null}
         </div>
         <div className="mb-4">
           <label
             htmlFor="status"
             className="block mb-2"
           >
-            Status:
+            New Status:
           </label>
           <select
-            id="status"
+            id="newStatus"
             value={formikUpdateTaskForm.values.newStatus}
-            name="status"
+            name="newStatus"
             onChange={formikUpdateTaskForm.handleChange}
             onBlur={formikUpdateTaskForm.handleBlur}
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -125,7 +144,6 @@ const EditModal: FunctionComponent<EditModalProps> = () => {
           <button
             type="submit"
             className="modal-btn-yes bg-green-400 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-            onClick={async () => {}}
           >
             {/* what to put here ? */}
             <span>Update</span>
@@ -133,9 +151,11 @@ const EditModal: FunctionComponent<EditModalProps> = () => {
 
           <button
             type="button"
-            // className="modal-btn-no ml-2 text-gray-600 hover:text-gray-800"
             className="cancel-btn ml-4 bg-rose-300 hover:bg-rose-500 text-white p-2 rounded-md  transition-all duration-300 ease-in-out"
-            onClick={() => setEditModalOpen(false)}
+            onClick={() => {
+              onRequestClose();
+              setEditModalOpen(false);
+            }}
           >
             Cancel
           </button>

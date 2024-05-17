@@ -3,18 +3,20 @@ import { Task } from "../types/taskTypes";
 import trash from "../assets/img/trash.svg";
 import { TasksContext } from "../context/tasksContext";
 import { useMediaQuery } from "../hooks/UseMediaQuery";
+import "../globalStyles/styles.scss";
 
 interface TaskCardProps {
   task: Task;
   setTaskToDeleteId: React.Dispatch<React.SetStateAction<string>>;
   deleteOneTask: (taskId: string) => Promise<void>;
+  setTaskToEdit: React.Dispatch<React.SetStateAction<Task | null>>;
 }
 const insertWhiteSpace = (text: string, interval: number) => {
   const regex = new RegExp(`(.{${interval}})`, "g");
   return text.replace(regex, "$1 ");
 };
 
-const TaskCard: FunctionComponent<TaskCardProps> = ({ task, setTaskToDeleteId, deleteOneTask }) => {
+const TaskCard: FunctionComponent<TaskCardProps> = ({ setTaskToEdit, task, setTaskToDeleteId, deleteOneTask }) => {
   const { setEditModalOpen, setIsTaskModalOpen } = useContext(TasksContext);
   const isSmallScreen = useMediaQuery("(max-width: 1400px)"); // meaning < 1400px
 
@@ -41,7 +43,9 @@ const TaskCard: FunctionComponent<TaskCardProps> = ({ task, setTaskToDeleteId, d
         />
       </button>
       <h3 className="text-lg font-bold mb-2">{task.title}</h3>
-      <p className="text-gray-600 mb-2 break-words">{insertWhiteSpace(task?.description, 30)}</p>
+      <div className={`${task?.description.length >= 180 ? "description__scroll" : ""}`}>
+        <p className="text-gray-600 mb-2 break-words">{insertWhiteSpace(task?.description, 30)}</p>
+      </div>
       <p className=" text-gray-500 mb-2">
         Status :
         <span className={`text-lg font-bold ${task.status === "pending" ? "text-sky-700" : "text-green-800"}`}>
@@ -49,7 +53,10 @@ const TaskCard: FunctionComponent<TaskCardProps> = ({ task, setTaskToDeleteId, d
         </span>
       </p>
       <button
-        onClick={() => setEditModalOpen(true)}
+        onClick={() => {
+          setEditModalOpen(true);
+          setTaskToEdit(task);
+        }}
         className="bottom-2 right-4 absolute bg-slate-400 hover:bg-slate-600 text-white px-4 py-0 pb-1 rounded-md  transition-all duration-300 ease-in-out"
       >
         <span className="text-xs">{"Edit"}</span>

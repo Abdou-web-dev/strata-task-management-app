@@ -40,19 +40,26 @@ export const deleteTask = async (taskId: string, token: string) => {
 export const updateTask = async (
   taskId: string,
   token: string,
-  newTitle: string,
-  newDesc: string,
-  newStatus: "completed" | "pending"
+  newTitle?: string,
+  newDesc?: string,
+  newStatus?: "completed" | "pending"
 ) => {
   try {
-    const updateReqBody = { newTitle, newDesc, newStatus };
+    const updateReqBody = {
+      ...(newTitle && { title: newTitle }),
+      ...(newDesc && { description: newDesc }),
+      ...(newStatus && { status: newStatus }),
+    };
 
-    await axios.put(`${API_URL}/tasks/${taskId}`, updateReqBody, {
+    const response = await axios.put(`${API_URL}/tasks/${taskId}`, updateReqBody, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    return response.data;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };

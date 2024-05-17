@@ -4,7 +4,33 @@
     justify-content: center;
     align-items: center;
   }
-  
+
+  @mixin scroll_styles {
+    max-height: 180px;
+    overflow-y: scroll;
+    padding: 2rem 0;
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      border-radius: 10px;
+      background: rgba(161, 160, 160, 0.05);
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      border-radius: 10px;
+      background: rgba(23, 22, 22, 0.44);
+    }
+  }
+
+
+
+
   
   .sedan-regular {
     font-family: "Sedan", serif;
@@ -68,3 +94,31 @@
         display: none !important;
     }
   }
+
+  .edit-resize-textarea{
+    resize: both;
+  }
+
+  .task-resize-textarea{
+    // resize: both;
+  }
+
+
+  .description__scroll {
+      @include scroll_styles();
+  }
+
+
+  .textarea-container {
+        textarea{
+    @include scroll_styles();
+  } 
+}
+
+  .home-container {
+    &.blur_styles {
+      filter: blur(4.5px);
+    }
+  
+  }
+  
