@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -23,4 +23,16 @@ export const createTask = async (title: string, description: string, status: str
     },
   });
   return response.data;
+};
+
+export const deleteTask = async (taskId: string, token: string) => {
+  try {
+    await axios.delete(`${API_URL}/tasks/${taskId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };

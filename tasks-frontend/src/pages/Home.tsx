@@ -1,16 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { getTasks, createTask } from "../api/tasks";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
-import { Task } from "../types/taskTypes";
 import { AuthContext } from "../context/authContext";
-import { useFormik } from "formik";
-import { taskValidationSchema } from "../validation/taskValidationSchema";
+import { TasksContext } from "../context/tasksContext";
 
 const Home: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-
   const { setIsLoggedIn } = useContext(AuthContext);
+  const { tasks, setTasks } = useContext(TasksContext);
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -28,6 +25,7 @@ const Home: React.FC = () => {
         const data = await getTasks(token);
         console.log(data, "tasks data from home page");
         setTasks(data);
+        // console.log(tasks.length, "tasks.length");
       }
     } catch (error) {
       console.error("Failed to fetch tasks:", error);
@@ -52,17 +50,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-container p-4 md:p-8 lg:p-12">
-      <h2 className="text-2xl font-bold mb-6 ">Tasks:</h2>
-      <div className="mb-8 flex justify-center">
-        <div className="w-full max-w-md p-4">
-          <TaskForm onSubmit={handleAddTask} />
-        </div>
-      </div>
-      <div className="tasks-list">
-        <TaskList tasks={tasks} />
-      </div>
-
+    <div className="home-container p-4 md:p-8 lg:p-12 lg:pe-4 lg:pt-4">
       {/* logout button */}
       <div className="flex justify-end mb-4">
         <button
@@ -71,6 +59,22 @@ const Home: React.FC = () => {
         >
           Logout
         </button>
+      </div>
+
+      <div className="mb-8 flex justify-center">
+        <div className="w-full max-w-md p-4">
+          <TaskForm onSubmit={handleAddTask} />
+        </div>
+      </div>
+
+      <div>
+        {tasks.length > 0 && (
+          <h2 className="text-2xl text-slate-700 mb-6 text-center font-roboto">Available Tasks :</h2>
+        )}
+      </div>
+
+      <div className="tasks-list">
+        <TaskList tasks={tasks} />
       </div>
     </div>
   );
