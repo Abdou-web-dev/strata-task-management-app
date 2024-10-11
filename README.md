@@ -6,7 +6,6 @@ and with Express , typescript, mongoose, jsonwebtoken on the backend
 ![Screenshot (783)](https://github.com/user-attachments/assets/f6e52943-b703-473a-93f2-a9b9638676f3)
 ![Screenshot (784)](https://github.com/user-attachments/assets/a50dde92-4426-4fd5-bc1c-6773bb9f9c92)
 ![Screenshot (785)](https://github.com/user-attachments/assets/98e4c9f7-80bc-40c4-86de-43e8882a5a49)
-![Screenshot (786)](https://github.com/user-attachments/assets/4c745f1c-c777-4917-88f9-7001fb90ad83)![Screenshot (787)](https://github.com/user-attachments/assets/633c033d-b7ac-4dce-9b3c-816aef5c14b6)
 
 ![Screenshot (788)](https://github.com/user-attachments/assets/3eb4f7af-0383-496f-8a43-45f61fb2fde1)![Screenshot (789)](https://github.com/user-attachments/assets/cd15e527-7792-4690-9cf7-5a082c1491fc)
 
